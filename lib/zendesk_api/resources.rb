@@ -8,6 +8,31 @@ module ZendeskAPI
   class OrganizationMembership < ReadResource; end
   class OrganizationSubscription < ReadResource; end
 
+  #help_center
+  class Article < Resource; end
+  class Section < Resource; end
+  class Category < Resource
+    namespace "help_center"
+
+    has_many Section
+    has_many Article
+  end
+  class Section < Resource
+    namespace "help_center"
+
+    has_many Article
+    has Category
+  end
+  class Article < Resource
+    namespace "help_center"
+
+    has :author, :class => User
+
+    def self.incremental(client, start_time)
+      ZendeskAPI::Collection.new(client, self, :path => "help_center/incremental/articles.json?start_time=#{start_time.to_i}")
+    end
+  end
+
   # @internal Begin actual Resource definitions
 
   class Locale < ReadResource; end
